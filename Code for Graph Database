@@ -1,0 +1,26 @@
+# GRA-Truist
+
+#CODE FOR MERGING NODES AND RELATIONSHIPS 
+
+LOAD CSV WITH HEADERS FROM "file:///housing_graph_final.csv" AS row
+
+MERGE (blockid:BlockID {BlockID: row.ID})
+
+ON CREATE SET blockid.Total_Rooms = toFloat(row.total_rooms), blockid.Bedrooms = toFloat(row.total_bedrooms), blockid.Population = toFloat(row.population)
+, blockid.Households_No = toFloat(row.households)
+
+MERGE (city:CITY {City: row.city})
+
+MERGE (income_range:INCOME_RANGE {Income_Range:row.median_income_range})
+
+MERGE (housevalue_range:HOUSEVALUE_RANGE {Housevalue_Range:row.Housevalue_Range})
+
+MERGE (housing_age_range:HOUSING_AGE_RANGE {Housing_Age_Range:row.Housing_Age_range})
+
+MERGE (blockid)-[earns:EARNS {Earns: toFloat(row.median_income)}]->(income_range)
+
+MERGE (blockid)-[value:VALUE {Value: toFloat(row.median_house_value)}]->(housevalue_range)
+
+MERGE (blockid)-[age:AGE {Age: toFloat(row.housing_median_age)}]->(housing_age_range)
+
+MERGE (blockid)-[location:LOCATION]->(city)
